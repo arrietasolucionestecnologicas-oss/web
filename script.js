@@ -3,6 +3,9 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxLayXPyMofzgr6sbh8o5dB
 const API_KEY = "AST_2025_SECURE";
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 
+// VARIABLE GLOBAL PARA GUARDAR PRODUCTOS (Para el Modal)
+let globalCatalog = [];
+
 // INICIALIZACIÓN
 document.addEventListener('DOMContentLoaded', () => {
     fetchData();
@@ -27,9 +30,11 @@ async function fetchData() {
         const result = await response.json();
 
         if (result.success) {
-            // SEPARAMOS SERVICIOS DE PRODUCTOS
-            const services = result.data.filter(item => item.tipo === 'SERVICIO');
-            const products = result.data.filter(item => item.tipo === 'PRODUCTO');
+            globalCatalog = result.data; // Guardamos copia global
+            
+            // SEPARAR DATA
+            const services = globalCatalog.filter(item => item.tipo === 'SERVICIO');
+            const products = globalCatalog.filter(item => item.tipo === 'PRODUCTO');
 
             renderServices(services, servicesContainer);
             renderStore(products, storeContainer);
@@ -43,7 +48,7 @@ async function fetchData() {
     }
 }
 
-// RENDERIZADOR DE SERVICIOS (Sin precio, solo cotizar)
+// RENDERIZADOR DE SERVICIOS
 function renderServices(items, container) {
     container.innerHTML = '';
     if (items.length === 0) {
@@ -52,7 +57,6 @@ function renderServices(items, container) {
     }
 
     items.forEach(s => {
-        // Imagen por defecto si no subiste una en la App
         const img = s.imagen ? s.imagen : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600';
         
         const html = `
@@ -77,7 +81,7 @@ function renderServices(items, container) {
     });
 }
 
-// RENDERIZADOR DE PRODUCTOS (Con precio y comprar)
+// RENDERIZADOR DE PRODUCTOS (Con Modal)
 function renderStore(items, container) {
     container.innerHTML = '';
     if (items.length === 0) {
@@ -87,11 +91,11 @@ function renderStore(items, container) {
 
     items.forEach(p => {
         const imageSrc = p.imagen ? p.imagen : 'https://via.placeholder.com/300x200?text=A.S.T.';
-        const wsLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en:%20${encodeURIComponent(p.nombre)}`;
-
+        
+        // AHORA EL BOTÓN Y LA TARJETA LLAMAN A "openProductModal"
         const html = `
         <div class="col-md-6 col-lg-4 col-xl-3">
-            <div class="product-card h-100 d-flex flex-column">
+            <div class="product-card h-100 d-flex flex-column" onclick="openProductModal('${p.uuid}')">
                 <div class="product-img-wrapper">
                     <img src="${imageSrc}" alt="${p.nombre}">
                 </div>
@@ -100,19 +104,39 @@ function renderStore(items, container) {
                         <span class="badge-category">${p.categoria || 'HARDWARE'}</span>
                     </div>
                     <h5 class="text-white fw-bold mb-2 text-truncate" title="${p.nombre}">${p.nombre}</h5>
-                    <p class="text-gray small mb-3 text-truncate" style="min-height: 20px;">${p.specs || '---'}</p>
+                    <p class="text-primary-tech fw-bold mb-0">${fmt.format(p.precio)}</p>
+                    <p class="text-gray small mb-3 text-truncate" style="min-height: 20px;">${p.specs || 'Ver detalles...'}</p>
                     
                     <div class="mt-auto pt-3 border-top border-secondary d-flex justify-content-between align-items-center">
-                        <span class="fs-5 fw-bold text-white">${fmt.format(p.precio)}</span>
-                        <a href="${wsLink}" target="_blank" class="btn btn-sm btn-primary-tech rounded-pill px-3" title="Consultar">
-                            <i class="bi bi-cart-plus me-1"></i> Comprar
-                        </a>
+                        <button class="btn btn-sm btn-primary-tech rounded-pill px-3 w-100">
+                            Ver Detalles <i class="bi bi-arrow-right-short"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>`;
         container.innerHTML += html;
     });
+}
+
+// FUNCIÓN PARA ABRIR EL MODAL CON DATOS
+function openProductModal(uuid) {
+    const p = globalCatalog.find(item => item.uuid === uuid);
+    if (!p) return;
+
+    // Llenar datos en el modal
+    document.getElementById('modal-p-img').src = p.imagen || 'https://via.placeholder.com/300x200?text=A.S.T.';
+    document.getElementById('modal-p-cat').innerText = p.categoria || 'HARDWARE';
+    document.getElementById('modal-p-name').innerText = p.nombre;
+    document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
+    document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
+
+    // Actualizar enlace de WhatsApp
+    const wsLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en%20comprar:%20${encodeURIComponent(p.nombre)}%20-%20Precio:%20${fmt.format(p.precio)}`;
+    document.getElementById('modal-p-btn').href = wsLink;
+
+    // Mostrar el modal
+    new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
 function handleError(c1, c2) {
