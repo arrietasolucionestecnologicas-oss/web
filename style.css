@@ -165,6 +165,7 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    cursor: pointer; /* Indicar que es cliqueable */
 }
 
 .product-card:hover {
@@ -208,6 +209,16 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
     background: rgba(56, 189, 248, 0.1);
     padding: 4px 8px;
     border-radius: 4px;
+}
+
+/* ESTILOS DEL MODAL (NUEVO) */
+.bg-modal-tech {
+    background-color: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.bg-dark-soft {
+    background-color: #0f172a;
 }
 
 /* FOOTER */
