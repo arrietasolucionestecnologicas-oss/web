@@ -1,11 +1,12 @@
 /* PALETA DE COLORES PROFESIONAL (Deep Tech) */
 :root {
-    --ast-primary: #0ea5e9; /* Azul Eléctrico Moderno (No neón) */
+    --ast-primary: #0ea5e9; /* Azul Ingeniería */
     --ast-primary-dark: #0284c7;
-    --ast-bg: #0f172a; /* Slate Blue Oscuro (Elegante) */
-    --ast-bg-secondary: #1e293b; /* Para tarjetas */
+    --ast-accent: #38bdf8; /* Cian suave para detalles */
+    --ast-bg: #0f172a; /* Slate Blue Oscuro */
+    --ast-bg-secondary: #1e293b; /* Tarjetas */
     --ast-text-main: #f8fafc;
-    --ast-text-muted: #94a3b8;
+    --ast-text-muted: #cbd5e1;
     --font-heading: 'Montserrat', sans-serif;
     --font-body: 'Open Sans', sans-serif;
 }
@@ -15,6 +16,9 @@ body {
     color: var(--ast-text-main);
     font-family: var(--font-body);
     overflow-x: hidden;
+    /* PATRÓN DE PUNTOS SUTIL (Ingeniería) */
+    background-image: radial-gradient(#334155 1px, transparent 1px);
+    background-size: 30px 30px;
 }
 
 /* TIPOGRAFÍA */
@@ -27,11 +31,12 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
 .fw-extrabold { font-weight: 800; }
 .tracking-wide { letter-spacing: 1px; }
 
-/* NAVBAR */
+/* NAVBAR (Vidrio Oscuro) */
 .bg-tech {
-    background-color: rgba(15, 23, 42, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
+    background-color: rgba(15, 23, 42, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .nav-link {
@@ -39,134 +44,151 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
     font-size: 0.9rem;
     color: var(--ast-text-muted) !important;
     transition: color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .nav-link:hover, .nav-link.active {
     color: var(--ast-primary) !important;
 }
 
-/* BOTONES */
-.btn-primary-tech {
-    background-color: var(--ast-primary);
-    border: none;
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-}
-
-.btn-primary-tech:hover {
-    background-color: var(--ast-primary-dark);
-    transform: translateY(-2px);
-    color: white;
-}
-
-.btn-outline-tech {
-    border: 2px solid var(--ast-primary);
-    color: var(--ast-primary);
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-outline-tech:hover {
-    background-color: var(--ast-primary);
-    color: white;
-}
-
-/* HERO SECTION */
+/* HERO SECTION (IMPACTO VISUAL) */
 .hero-section {
-    min-height: 90vh; /* Altura cómoda */
-    padding-top: 100px;
-    background: radial-gradient(circle at top right, #1e293b 0%, var(--ast-bg) 60%);
+    min-height: 95vh;
+    padding-top: 80px;
     position: relative;
+    display: flex;
+    align-items: center;
+    /* IMAGEN DE FONDO REAL (Ingeniería/Abstracto) */
+    background: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
     overflow: hidden;
+}
+
+/* Superposición oscura para que se lea el texto */
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.8) 50%, rgba(15, 23, 42, 0.4) 100%);
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2; /* Encima de la imagen */
 }
 
 .text-gradient {
     background: linear-gradient(to right, #38bdf8, #818cf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-weight: 900;
 }
 
-.bg-light-blue {
-    background-color: rgba(14, 165, 233, 0.1);
+.bg-glass-tag {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
 }
 
-/* GRÁFICO HERO SUTIL */
-.hero-graphic {
-    position: relative;
-    display: inline-block;
+/* BOTONES CON CARÁCTER */
+.btn-primary-tech {
+    background-color: var(--ast-primary);
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 12px 35px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
 }
 
-.glow-circle {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    background: var(--ast-primary);
-    filter: blur(100px);
-    opacity: 0.2;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
+.btn-primary-tech:hover {
+    background-color: var(--ast-primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.6);
+    color: white;
+}
+
+.btn-outline-tech {
+    border: 2px solid white;
+    color: white;
+    font-weight: 700;
+    padding: 12px 35px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+
+.btn-outline-tech:hover {
+    background-color: white;
+    color: var(--ast-bg);
 }
 
 /* SECCIONES */
-.bg-section {
-    background-color: #162036; /* Un tono ligeramente más claro que el fondo */
+.section-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
 }
 
 .divider {
-    height: 4px;
-    width: 60px;
-    border-radius: 2px;
+    height: 5px;
+    width: 80px;
+    background: var(--ast-primary);
     margin-top: 1rem;
+    border-radius: 3px;
 }
 
-/* TARJETAS DE SERVICIOS (Limpio y Corporativo) */
+/* TARJETAS DE SERVICIOS (Profesionales) */
 .tech-card {
-    background-color: var(--ast-bg-secondary);
-    border-radius: 12px;
+    background-color: var(--ast-bg-secondary); /* Azul oscuro */
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .tech-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
     border-color: var(--ast-primary);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background-color: #25334d;
 }
 
 .icon-wrapper {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
-    background-color: rgba(14, 165, 233, 0.1);
-    border-radius: 12px;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0));
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    border-radius: 14px;
     color: var(--ast-primary);
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
 }
 
-/* TARJETAS DE PRODUCTOS (Ecommerce Style) */
+/* TARJETAS DE PRODUCTOS (CORREGIDO: Dark Theme) */
 .product-card {
-    background-color: var(--ast-bg-secondary);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    background-color: var(--ast-bg-secondary); /* Fondo oscuro, no blanco */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     overflow: hidden;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .product-card:hover {
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    transform: translateY(-5px);
+    border-color: var(--ast-primary);
 }
 
 .product-img-wrapper {
-    height: 200px;
-    background-color: white; /* Fondo blanco para productos se ve más pro */
+    height: 220px;
+    background-color: #ffffff; /* Fondo blanco SOLO para la foto del producto */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -177,27 +199,38 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
 .product-img-wrapper img {
     max-height: 100%;
     max-width: 100%;
-    object-fit: contain; /* Para que se vea todo el producto sin cortar */
-    transition: transform 0.3s;
+    object-fit: contain; 
+    transition: transform 0.4s;
 }
 
 .product-card:hover img {
-    transform: scale(1.05);
+    transform: scale(1.1);
+}
+
+.card-body-dark {
+    padding: 1.5rem;
+    color: white; /* Texto blanco asegurado */
 }
 
 .badge-category {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     text-transform: uppercase;
     font-weight: 700;
-    color: var(--ast-text-muted);
+    color: var(--ast-accent);
     letter-spacing: 1px;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
 }
 
 /* FOOTER */
 .bg-darker {
     background-color: #020617; /* Casi negro */
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .hover-light:hover {
-    color: white !important;
+    color: var(--ast-primary) !important;
+    padding-left: 5px; /* Pequeño movimiento al hover */
+    transition: all 0.2s;
 }
