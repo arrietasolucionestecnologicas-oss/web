@@ -3,7 +3,10 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxLayXPyMofzgr6sbh8o5dB
 const API_KEY = "AST_2025_SECURE";
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 
-// VARIABLE GLOBAL PARA GUARDAR PRODUCTOS (Para el Modal)
+// URL BASE DE TU PÁGINA (Para el mensaje de compartir)
+const WEB_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/";
+
+// VARIABLE GLOBAL PARA GUARDAR PRODUCTOS
 let globalCatalog = [];
 
 // INICIALIZACIÓN
@@ -30,9 +33,8 @@ async function fetchData() {
         const result = await response.json();
 
         if (result.success) {
-            globalCatalog = result.data; // Guardamos copia global
+            globalCatalog = result.data; 
             
-            // SEPARAR DATA
             const services = globalCatalog.filter(item => item.tipo === 'SERVICIO');
             const products = globalCatalog.filter(item => item.tipo === 'PRODUCTO');
 
@@ -81,7 +83,7 @@ function renderServices(items, container) {
     });
 }
 
-// RENDERIZADOR DE PRODUCTOS (Con Modal)
+// RENDERIZADOR DE PRODUCTOS
 function renderStore(items, container) {
     container.innerHTML = '';
     if (items.length === 0) {
@@ -92,7 +94,6 @@ function renderStore(items, container) {
     items.forEach(p => {
         const imageSrc = p.imagen ? p.imagen : 'https://via.placeholder.com/300x200?text=A.S.T.';
         
-        // AHORA EL BOTÓN Y LA TARJETA LLAMAN A "openProductModal"
         const html = `
         <div class="col-md-6 col-lg-4 col-xl-3">
             <div class="product-card h-100 d-flex flex-column" onclick="openProductModal('${p.uuid}')">
@@ -119,23 +120,28 @@ function renderStore(items, container) {
     });
 }
 
-// FUNCIÓN PARA ABRIR EL MODAL CON DATOS
+// FUNCIÓN MODAL ACTUALIZADA
 function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
 
-    // Llenar datos en el modal
+    // Llenar datos visuales
     document.getElementById('modal-p-img').src = p.imagen || 'https://via.placeholder.com/300x200?text=A.S.T.';
     document.getElementById('modal-p-cat').innerText = p.categoria || 'HARDWARE';
     document.getElementById('modal-p-name').innerText = p.nombre;
     document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
 
-    // Actualizar enlace de WhatsApp
-    const wsLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en%20comprar:%20${encodeURIComponent(p.nombre)}%20-%20Precio:%20${fmt.format(p.precio)}`;
-    document.getElementById('modal-p-btn').href = wsLink;
+    // 1. CONFIGURAR BOTÓN DE COMPRA (Va directo a tu número)
+    const buyLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en%20comprar:%20${encodeURIComponent(p.nombre)}%20-%20Precio:%20${fmt.format(p.precio)}`;
+    document.getElementById('modal-p-btn').href = buyLink;
 
-    // Mostrar el modal
+    // 2. CONFIGURAR BOTÓN DE COMPARTIR (Va al selector de contactos vacío)
+    const shareMsg = `¡Hola! Mira este producto que encontré en A.S.T.:\n\n*${p.nombre}*\nPrecio: ${fmt.format(p.precio)}\n\n${p.specs || ''}\n\nMás info en: ${WEB_URL}`;
+    const shareLink = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
+    document.getElementById('modal-p-share').href = shareLink;
+
+    // Mostrar modal
     new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
