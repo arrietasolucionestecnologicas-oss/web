@@ -1,9 +1,9 @@
 /* PALETA DE COLORES PROFESIONAL (Deep Tech) */
 :root {
-    --ast-primary: #0ea5e9; /* Azul Eléctrico Moderno (No neón) */
+    --ast-primary: #0ea5e9; /* Azul Eléctrico Moderno */
     --ast-primary-dark: #0284c7;
-    --ast-accent: #38bdf8; /* Cian suave para detalles */
-    --ast-bg: #0f172a; /* Slate Blue Oscuro (Elegante) */
+    --ast-accent: #38bdf8; 
+    --ast-bg: #0f172a; /* Slate Blue Oscuro */
     --ast-bg-secondary: #1e293b; /* Tarjetas */
     --ast-text-main: #f8fafc;
     --ast-text-muted: #cbd5e1;
@@ -16,7 +16,7 @@ body {
     color: var(--ast-text-main);
     font-family: var(--font-body);
     overflow-x: hidden;
-    /* PATRÓN DE PUNTOS SUTIL (Ingeniería) */
+    /* PATRÓN DE PUNTOS SUTIL DE FONDO */
     background-image: radial-gradient(#334155 1px, transparent 1px);
     background-size: 30px 30px;
 }
@@ -52,30 +52,29 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
     color: var(--ast-primary) !important;
 }
 
-/* HERO SECTION (FONDO CORREGIDO: INGENIERÍA/ENERGÍA) */
+/* HERO SECTION (IMPACTO VISUAL INGENIERÍA) */
 .hero-section {
     min-height: 95vh;
     padding-top: 80px;
     position: relative;
     display: flex;
     align-items: center;
-    /* NUEVA IMAGEN: Representa Redes, Energía, Estructura y Datos (No chips) */
+    /* IMAGEN DE FONDO: Redes de energía/datos abstractas */
     background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop') no-repeat center center/cover;
     overflow: hidden;
 }
 
-/* Superposición oscura para que se lea el texto */
+/* Superposición oscura */
 .hero-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    /* Degradado azul oscuro muy profesional */
     background: linear-gradient(90deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.85) 50%, rgba(15, 23, 42, 0.6) 100%);
     z-index: 1;
 }
 
 .hero-content {
     position: relative;
-    z-index: 2; /* Encima de la imagen */
+    z-index: 2; 
 }
 
 .text-gradient {
@@ -91,7 +90,7 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
     backdrop-filter: blur(5px);
 }
 
-/* BOTONES CON CARÁCTER */
+/* BOTONES PROFESIONALES */
 .btn-primary-tech {
     background-color: var(--ast-primary);
     border: none;
@@ -142,12 +141,13 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
 
 /* TARJETAS DE SERVICIOS (Profesionales) */
 .tech-card {
-    background-color: var(--ast-bg-secondary); /* Azul oscuro */
+    background-color: var(--ast-bg-secondary);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
+    height: 100%;
 }
 
 .tech-card:hover {
@@ -155,20 +155,6 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
     border-color: var(--ast-primary);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     background-color: #25334d;
-}
-
-.icon-wrapper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0));
-    border: 1px solid rgba(14, 165, 233, 0.3);
-    border-radius: 14px;
-    color: var(--ast-primary);
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
 }
 
 /* TARJETAS DE PRODUCTOS (Dark Theme) */
@@ -189,7 +175,7 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
 
 .product-img-wrapper {
     height: 220px;
-    background-color: #ffffff; /* Fondo blanco SOLO para la foto del producto */
+    background-color: #ffffff; /* Fondo blanco para producto */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -210,7 +196,7 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
 
 .card-body-dark {
     padding: 1.5rem;
-    color: white; /* Texto blanco asegurado */
+    color: white; 
 }
 
 .badge-category {
@@ -226,12 +212,12 @@ h1, h2, h3, h4, h5, .navbar-brand, .btn {
 
 /* FOOTER */
 .bg-darker {
-    background-color: #020617; /* Casi negro */
+    background-color: #020617; 
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .hover-light:hover {
     color: var(--ast-primary) !important;
-    padding-left: 5px; /* Pequeño movimiento al hover */
+    padding-left: 5px; 
     transition: all 0.2s;
 }
