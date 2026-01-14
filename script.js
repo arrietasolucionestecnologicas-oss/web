@@ -1,15 +1,27 @@
-// CONFIGURACIÓN DE CONEXIÓN
+// ==========================================
+// CONFIGURACIÓN Y CONSTANTES DEL SISTEMA
+// ==========================================
 const API_URL = "https://script.google.com/macros/s/AKfycbxLayXPyMofzgr6sbh8o5dB57Gg_jKIJGlIo8peFhojmklaE1xkzSssXsH4dhIHMKbfgA/exec";
 const API_KEY = "AST_2025_SECURE";
-const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
-
-// URL BASE DE TU PÁGINA (Para referencias)
 const WEB_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/";
 
-// VARIABLE GLOBAL PARA GUARDAR PRODUCTOS
+// IMÁGENES POR DEFECTO (Para mantener consistencia visual)
+const DEFAULT_IMG_SERVICE = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600';
+const DEFAULT_IMG_PRODUCT = 'https://via.placeholder.com/300x200?text=A.S.T.+Hardware';
+
+// FORMATEADOR DE MONEDA (COP)
+const fmt = new Intl.NumberFormat('es-CO', { 
+    style: 'currency', 
+    currency: 'COP', 
+    maximumFractionDigits: 0 
+});
+
+// ESTADO GLOBAL
 let globalCatalog = [];
 
+// ==========================================
 // INICIALIZACIÓN
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     fetchData();
 });
@@ -50,7 +62,9 @@ async function fetchData() {
     }
 }
 
-// RENDERIZADOR DE SERVICIOS (CORREGIDO PARA INCLUIR COMPARTIR)
+// ==========================================
+// RENDERIZADOR DE SERVICIOS (MODIFICADO)
+// ==========================================
 function renderServices(items, container) {
     container.innerHTML = '';
     if (items.length === 0) {
@@ -59,16 +73,18 @@ function renderServices(items, container) {
     }
 
     items.forEach(s => {
-        const img = s.imagen ? s.imagen : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600';
+        // Lógica de imagen consistente
+        const img = s.imagen && s.imagen.trim() !== '' ? s.imagen : DEFAULT_IMG_SERVICE;
         
-        // CORRECCIÓN AQUI: Se agregó onclick para abrir modal y se añadió el botón de compartir
+        // Renderizado de tarjeta
         const html = `
         <div class="col-md-6 col-lg-3">
             <div class="tech-card h-100 overflow-hidden p-0 d-flex flex-column" onclick="openProductModal('${s.uuid}')" style="cursor: pointer;">
                 <div style="height: 180px; overflow: hidden; position: relative;">
                     <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent, rgba(30, 41, 59, 1));"></div>
-                    <img src="${img}" style="width:100%; height:100%; object-fit: cover; opacity: 0.9;">
+                    <img src="${img}" style="width:100%; height:100%; object-fit: cover; opacity: 0.9;" alt="${s.nombre}">
                 </div>
+
                 <div class="p-4 d-flex flex-column flex-grow-1" style="margin-top: -20px; position: relative; z-index: 2;">
                     <h4 class="text-white h5 fw-bold mb-3">${s.nombre}</h4>
                     <p class="text-gray small flex-grow-1 mb-4" style="line-height: 1.6;">${s.specs || 'Solución profesional garantizada.'}</p>
@@ -89,7 +105,9 @@ function renderServices(items, container) {
     });
 }
 
-// RENDERIZADOR DE PRODUCTOS
+// ==========================================
+// RENDERIZADOR DE PRODUCTOS (TIENDA)
+// ==========================================
 function renderStore(items, container) {
     container.innerHTML = '';
     if (items.length === 0) {
@@ -98,7 +116,7 @@ function renderStore(items, container) {
     }
 
     items.forEach(p => {
-        const imageSrc = p.imagen ? p.imagen : 'https://via.placeholder.com/300x200?text=A.S.T.';
+        const imageSrc = p.imagen && p.imagen.trim() !== '' ? p.imagen : DEFAULT_IMG_PRODUCT;
         
         const html = `
         <div class="col-md-6 col-lg-4 col-xl-3">
@@ -126,33 +144,46 @@ function renderStore(items, container) {
     });
 }
 
-// FUNCIÓN MODAL ACTUALIZADA (GENERA ENLACE CON IMAGEN)
+// ==========================================
+// GESTOR DE MODAL Y COMPARTIR (UPDATE)
+// ==========================================
 function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
 
-    // Llenar datos visuales
-    document.getElementById('modal-p-img').src = p.imagen || 'https://via.placeholder.com/300x200?text=A.S.T.';
+    // 1. DETERMINAR IMAGEN CORRECTA (Corrección de Bug Visual)
+    // Si no tiene imagen, usa el default correspondiente a su TIPO
+    let finalImage = p.imagen && p.imagen.trim() !== '' ? p.imagen : null;
+    if (!finalImage) {
+        finalImage = p.tipo === 'SERVICIO' ? DEFAULT_IMG_SERVICE : DEFAULT_IMG_PRODUCT;
+    }
+
+    // 2. LLENAR DATOS VISUALES
+    document.getElementById('modal-p-img').src = finalImage;
     document.getElementById('modal-p-cat').innerText = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE');
     document.getElementById('modal-p-name').innerText = p.nombre;
     
-    // Si es servicio y precio es 0 o no definido, mostrar mensaje
+    // Lógica de precio para servicios
     if (p.tipo === 'SERVICIO' && (!p.precio || p.precio === 0)) {
-        document.getElementById('modal-p-price').innerText = "Cotizar";
+        document.getElementById('modal-p-price').innerText = "Cotización Personalizada";
     } else {
         document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
     }
     
-    document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
+    document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada disponible.';
 
-    // 1. CONFIGURAR BOTÓN DE COMPRA (Va directo a tu número)
-    const buyLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en:%20${encodeURIComponent(p.nombre)}`;
+    // 3. CONFIGURAR BOTÓN DE CONSULTA/COMPRA (WhatsApp)
+    const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar el servicio:' : 'estoy interesado en comprar:';
+    const buyLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
     document.getElementById('modal-p-btn').href = buyLink;
+    document.getElementById('modal-p-btn').innerHTML = `<i class="bi bi-whatsapp me-2"></i> ${p.tipo === 'SERVICIO' ? 'COTIZAR' : 'COMPRAR'}`;
 
-    // 2. CONFIGURAR BOTÓN DE COMPARTIR (ENLACE INTELIGENTE BACKEND)
-    // Usamos API_URL + ?shareId para que salga la foto en WhatsApp
+    // 4. CONFIGURAR BOTÓN DE COMPARTIR (GENERADOR DE FLYER)
+    // Usamos el Endpoint de GAS para generar la vista previa (OG Tags)
     const smartLink = `${API_URL}?shareId=${p.uuid}`;
-    const shareMsg = `Mira este servicio/producto de A.S.T.:\n*${p.nombre}*\n\n${smartLink}`;
+    
+    // Mensaje personalizado para el post
+    const shareMsg = `🚀 *A.S.T. Soluciones Tecnológicas*\n\nMira este excelente ${p.tipo === 'SERVICIO' ? 'servicio' : 'producto'}:\n\n*${p.nombre}*\n${p.specs ? '_'+p.specs.substring(0, 50)+'..._' : ''}\n\n👉 *Ver aquí:* ${smartLink}`;
     
     const shareLinkWhatsapp = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
     document.getElementById('modal-p-share').href = shareLinkWhatsapp;
@@ -161,8 +192,11 @@ function openProductModal(uuid) {
     new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
+// ==========================================
+// MANEJO DE ERRORES UI
+// ==========================================
 function handleError(c1, c2) {
-    const err = `<div class="col-12 text-center text-danger"><p>Error de conexión.</p></div>`;
-    c1.innerHTML = err;
-    c2.innerHTML = err;
+    const err = `<div class="col-12 text-center text-danger"><p><i class="bi bi-wifi-off me-2"></i>Error de conexión con el servidor.</p></div>`;
+    if(c1) c1.innerHTML = err;
+    if(c2) c2.innerHTML = err;
 }
