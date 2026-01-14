@@ -3,7 +3,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxLayXPyMofzgr6sbh8o5dB
 const API_KEY = "AST_2025_SECURE";
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 
-// URL BASE DE TU PÁGINA (Para el mensaje de compartir)
+// URL BASE DE TU PÁGINA (Para referencias)
 const WEB_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/";
 
 // VARIABLE GLOBAL PARA GUARDAR PRODUCTOS
@@ -50,7 +50,7 @@ async function fetchData() {
     }
 }
 
-// RENDERIZADOR DE SERVICIOS
+// RENDERIZADOR DE SERVICIOS (CORREGIDO PARA INCLUIR COMPARTIR)
 function renderServices(items, container) {
     container.innerHTML = '';
     if (items.length === 0) {
@@ -61,9 +61,10 @@ function renderServices(items, container) {
     items.forEach(s => {
         const img = s.imagen ? s.imagen : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600';
         
+        // CORRECCIÓN AQUI: Se agregó onclick para abrir modal y se añadió el botón de compartir
         const html = `
         <div class="col-md-6 col-lg-3">
-            <div class="tech-card h-100 overflow-hidden p-0 d-flex flex-column">
+            <div class="tech-card h-100 overflow-hidden p-0 d-flex flex-column" onclick="openProductModal('${s.uuid}')" style="cursor: pointer;">
                 <div style="height: 180px; overflow: hidden; position: relative;">
                     <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent, rgba(30, 41, 59, 1));"></div>
                     <img src="${img}" style="width:100%; height:100%; object-fit: cover; opacity: 0.9;">
@@ -72,10 +73,15 @@ function renderServices(items, container) {
                     <h4 class="text-white h5 fw-bold mb-3">${s.nombre}</h4>
                     <p class="text-gray small flex-grow-1 mb-4" style="line-height: 1.6;">${s.specs || 'Solución profesional garantizada.'}</p>
                     
-                    <a href="https://wa.me/573137713430?text=Hola%20A.S.T.,%20me%20interesa%20cotizar%20el%20servicio:%20${encodeURIComponent(s.nombre)}" 
-                       target="_blank" class="btn btn-outline-tech btn-sm w-100 rounded-pill">
-                       <i class="bi bi-whatsapp me-2"></i> Cotizar Servicio
-                    </a>
+                    <div class="d-flex gap-2 mt-auto">
+                        <a href="https://wa.me/573137713430?text=Hola%20A.S.T.,%20me%20interesa%20cotizar%20el%20servicio:%20${encodeURIComponent(s.nombre)}" 
+                           target="_blank" class="btn btn-outline-tech btn-sm flex-grow-1 rounded-pill" onclick="event.stopPropagation()">
+                           <i class="bi bi-whatsapp me-2"></i> Cotizar
+                        </a>
+                        <button class="btn btn-primary-tech btn-sm rounded-pill px-3" onclick="event.stopPropagation(); openProductModal('${s.uuid}')" title="Ver y Compartir">
+                            <i class="bi bi-share-fill"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>`;
@@ -120,26 +126,36 @@ function renderStore(items, container) {
     });
 }
 
-// FUNCIÓN MODAL ACTUALIZADA
+// FUNCIÓN MODAL ACTUALIZADA (GENERA ENLACE CON IMAGEN)
 function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
 
     // Llenar datos visuales
     document.getElementById('modal-p-img').src = p.imagen || 'https://via.placeholder.com/300x200?text=A.S.T.';
-    document.getElementById('modal-p-cat').innerText = p.categoria || 'HARDWARE';
+    document.getElementById('modal-p-cat').innerText = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE');
     document.getElementById('modal-p-name').innerText = p.nombre;
-    document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
+    
+    // Si es servicio y precio es 0 o no definido, mostrar mensaje
+    if (p.tipo === 'SERVICIO' && (!p.precio || p.precio === 0)) {
+        document.getElementById('modal-p-price').innerText = "Cotizar";
+    } else {
+        document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
+    }
+    
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
 
     // 1. CONFIGURAR BOTÓN DE COMPRA (Va directo a tu número)
-    const buyLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en%20comprar:%20${encodeURIComponent(p.nombre)}%20-%20Precio:%20${fmt.format(p.precio)}`;
+    const buyLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20estoy%20interesado%20en:%20${encodeURIComponent(p.nombre)}`;
     document.getElementById('modal-p-btn').href = buyLink;
 
-    // 2. CONFIGURAR BOTÓN DE COMPARTIR (Va al selector de contactos vacío)
-    const shareMsg = `¡Hola! Mira este producto que encontré en A.S.T.:\n\n*${p.nombre}*\nPrecio: ${fmt.format(p.precio)}\n\n${p.specs || ''}\n\nMás info en: ${WEB_URL}`;
-    const shareLink = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
-    document.getElementById('modal-p-share').href = shareLink;
+    // 2. CONFIGURAR BOTÓN DE COMPARTIR (ENLACE INTELIGENTE BACKEND)
+    // Usamos API_URL + ?shareId para que salga la foto en WhatsApp
+    const smartLink = `${API_URL}?shareId=${p.uuid}`;
+    const shareMsg = `Mira este servicio/producto de A.S.T.:\n*${p.nombre}*\n\n${smartLink}`;
+    
+    const shareLinkWhatsapp = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
+    document.getElementById('modal-p-share').href = shareLinkWhatsapp;
 
     // Mostrar modal
     new bootstrap.Modal(document.getElementById('productModal')).show();
