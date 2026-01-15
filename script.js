@@ -2,7 +2,7 @@
 // CONFIGURACIÓN (PEGAR NUEVA URL AQUI TAMBIÉN)
 // ==========================================
 // PEGA AQUÍ LA NUEVA URL QUE TE DIO GOOGLE AL DARLE A "NUEVA IMPLEMENTACIÓN"
-const API_URL = "https://script.google.com/macros/s/AKfycbwqPQBBG8sHV3mLmY1K5E0bnKlAMRZEYz4hpsq1GSTSwgd2MmpCkVkIKWrRft4uCXSOig/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxcWc83WPaNd0v0QnsuyH0h-6hZNIxFpk61A0pbYBiegyKLPwfsCQ3uqxggRv1uTsw4hw/exec";
 const API_KEY = "AST_2025_SECURE";
 
 // IMÁGENES POR DEFECTO
