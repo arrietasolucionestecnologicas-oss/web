@@ -1,12 +1,11 @@
 // ==========================================
-// CONFIGURACIÓN FRONTEND (V14 - BOTÓN OCULTO/DISCRETO)
+// CONFIGURACIÓN FRONTEND (V14 - BOTÓN FANTASMA)
 // ==========================================
-
-// URL BASE DE TU GITHUB
+// PEGA AQUÍ LA NUEVA URL QUE TE DIO GOOGLE AL DARLE A "NUEVA IMPLEMENTACIÓN"
 const API_URL = "https://script.google.com/macros/s/AKfycbxcWc83WPaNd0v0QnsuyH0h-6hZNIxFpk61A0pbYBiegyKLPwfsCQ3uqxggRv1uTsw4hw/exec";
 const API_KEY = "AST_2025_SECURE";
 
-
+// URL BASE DE TU GITHUB
 const GITHUB_BASE_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/share/";
 
 const DEFAULT_IMG_SERVICE = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600';
@@ -65,10 +64,10 @@ function renderServices(items, container) {
                     <img src="${img}" style="width:100%; height:100%; object-fit: cover;">
                     
                     <button class="btn btn-dark rounded-circle position-absolute top-0 end-0 m-2 shadow-sm" 
-                            style="width:35px; height:35px; padding:0; opacity:0.6; border:1px solid #555;" 
+                            style="width:35px; height:35px; padding:0; opacity:0.7; border:1px solid #555; z-index:10;" 
                             onclick="event.stopPropagation(); copyToClipboard('${githubLink}')" 
                             title="Copiar Enlace">
-                        <i class="bi bi-link-45deg text-white"></i>
+                        <i class="bi bi-link-45deg text-white fs-5"></i>
                     </button>
                 </div>
 
@@ -104,10 +103,10 @@ function renderStore(items, container) {
                     <img src="${imageSrc}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: contain;">
                     
                     <button class="btn btn-dark rounded-circle position-absolute top-0 end-0 m-2 shadow-sm" 
-                            style="width:35px; height:35px; padding:0; opacity:0.6; border:1px solid #555;" 
+                            style="width:35px; height:35px; padding:0; opacity:0.7; border:1px solid #555; z-index:10;" 
                             onclick="event.stopPropagation(); copyToClipboard('${githubLink}')" 
                             title="Copiar Enlace">
-                        <i class="bi bi-link-45deg text-white"></i>
+                        <i class="bi bi-link-45deg text-white fs-5"></i>
                     </button>
                 </div>
 
@@ -152,21 +151,22 @@ function openProductModal(uuid) {
     if (!finalImage) finalImage = p.tipo === 'SERVICIO' ? DEFAULT_IMG_SERVICE : DEFAULT_IMG_PRODUCT;
 
     document.getElementById('modal-p-img').src = finalImage;
-    document.getElementById('modal-p-cat').innerText = p.tipo === 'SERVICIO' ? 'SERVICIO' : 'HARDWARE';
+    document.getElementById('modal-p-cat').innerText = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE');
     document.getElementById('modal-p-name').innerText = p.nombre;
     if (p.tipo === 'SERVICIO' && (!p.precio || p.precio === 0)) document.getElementById('modal-p-price').innerText = "Cotizar";
     else document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
-    document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción.';
+    document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
 
     const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar:' : 'me interesa comprar:';
     document.getElementById('modal-p-btn').href = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
 
-    // Botón compartir interno del modal también discreto (o lo dejamos como estaba, tú decides)
-    // Aquí restauré el estilo original de "Compartir" pero con la función de copiar
+    // EN EL MODAL, TAMBIÉN HACEMOS EL BOTÓN DISCRETO O LO DEJAMOS CLARO
+    // Aquí dejaré el botón claro porque en el modal hay espacio y es útil verlo
+    const githubLink = generateGitHubLink(p.nombre);
     const btnShare = document.getElementById('modal-p-share');
     const newBtn = btnShare.cloneNode(true);
     newBtn.innerHTML = '<i class="bi bi-link-45deg me-2"></i> Copiar Link';
-    newBtn.onclick = (e) => { e.preventDefault(); copyToClipboard(generateGitHubLink(p.nombre)); };
+    newBtn.onclick = (e) => { e.preventDefault(); copyToClipboard(githubLink); };
     newBtn.removeAttribute('href');
     newBtn.removeAttribute('target');
     btnShare.parentNode.replaceChild(newBtn, btnShare);
