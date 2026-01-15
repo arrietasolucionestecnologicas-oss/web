@@ -1,7 +1,8 @@
 // ==========================================
 // CONFIGURACIÓN Y CONSTANTES
 // ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbxLayXPyMofzgr6sbh8o5dB57Gg_jKIJGlIo8peFhojmklaE1xkzSssXsH4dhIHMKbfgA/exec";
+// *** PEGA AQUÍ LA NUEVA URL QUE TE DIO GOOGLE APPS SCRIPT AL IMPLEMENTAR ***
+const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL_AQUI/exec";
 const API_KEY = "AST_2025_SECURE";
 
 // IMÁGENES POR DEFECTO (Para Flyer Profesional)
