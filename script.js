@@ -152,19 +152,26 @@ function renderStore(items, container) {
 }
 
 // ==========================================
-// LÓGICA DE COMPARTIR Y MODALES
+// LÓGICA DE COMPARTIR Y MODALES (UNICODE SEGURO)
 // ==========================================
 
-// Función directa para compartir sin abrir modal (usada en botones)
+// Limpiador seguro para URLs de WhatsApp
+function cleanTextForUrl(text) {
+    if (!text) return "";
+    // Permite letras, números, espacios y puntuación básica. Elimina emojis y raros.
+    return text.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s\.,\-\(\)]/g, '').trim();
+}
+
+// Función directa para compartir sin abrir modal
 function shareItem(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
 
-    // Generar link inteligente
     const smartLink = `${API_URL}?shareId=${uuid}`;
-    const cleanName = p.nombre.replace(/[^\w\s\sáéíóúÁÉÍÓÚñÑüÜ.,-]/g, '').trim();
+    const cleanName = cleanTextForUrl(p.nombre);
     
-    const text = `Mira esta solución de A.S.T.:\n*${cleanName}*\n${smartLink}`;
+    // Usamos \uD83D\uDC47 para el dedo abajo y \uD83D\uDE80 para el cohete
+    const text = `Mira esta soluci\u00F3n de A.S.T.:\n*${cleanName}*\n${smartLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
@@ -173,7 +180,6 @@ function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
 
-    // Imagen correcta para el modal
     let finalImage = p.imagen && p.imagen.startsWith('http') ? p.imagen : null;
     if (!finalImage) {
         finalImage = p.tipo === 'SERVICIO' ? DEFAULT_IMG_SERVICE : DEFAULT_IMG_PRODUCT;
@@ -196,10 +202,12 @@ function openProductModal(uuid) {
     const buyLink = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
     document.getElementById('modal-p-btn').href = buyLink;
 
-    // Botón Compartir (Dentro del Modal)
+    // Botón Compartir (Unicode Seguro)
     const smartLink = `${API_URL}?shareId=${p.uuid}`;
-    const cleanName = p.nombre.replace(/[^\w\s\sáéíóúÁÉÍÓÚñÑüÜ.,-]/g, '').trim();
-    const shareMsg = `🚀 *A.S.T. Soluciones*\n\nMira este ${p.tipo === 'SERVICIO' ? 'servicio' : 'producto'}:\n*${cleanName}*\n\n👇 *Ver detalles aquí:*\n${smartLink}`;
+    const cleanName = cleanTextForUrl(p.nombre);
+    // Rocket: \uD83D\uDE80, Finger: \uD83D\uDC47
+    const shareMsg = `\uD83D\uDE80 *A.S.T. Soluciones*\n\nMira este ${p.tipo === 'SERVICIO' ? 'servicio' : 'producto'}:\n*${cleanName}*\n\n\uD83D\uDC47 *Ver detalles aqu\u00ED:*\n${smartLink}`;
+    
     document.getElementById('modal-p-share').href = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
 
     new bootstrap.Modal(document.getElementById('productModal')).show();
