@@ -157,11 +157,10 @@ function openProductModal(uuid) {
     else document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
 
-    const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar:' : 'me interesa comprar:';
+    const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar el servicio:' : 'estoy interesado en comprar:';
     document.getElementById('modal-p-btn').href = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
 
-    // EN EL MODAL, TAMBIÉN HACEMOS EL BOTÓN DISCRETO O LO DEJAMOS CLARO
-    // Aquí dejaré el botón claro porque en el modal hay espacio y es útil verlo
+    // BOTÓN DENTRO DEL MODAL (AQUÍ SÍ VISIBLE Y CLARO)
     const githubLink = generateGitHubLink(p.nombre);
     const btnShare = document.getElementById('modal-p-share');
     const newBtn = btnShare.cloneNode(true);
