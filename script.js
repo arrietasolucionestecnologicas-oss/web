@@ -3,7 +3,7 @@
 // ==========================================
 // PEGA AQUÍ LA NUEVA URL QUE TE DIO GOOGLE AL DARLE A "NUEVA IMPLEMENTACIÓN"
 const API_URL = "https://script.google.com/macros/s/AKfycbxpCp7aY4L48znjtqH_1svYzY6MjVY58bXxt3iZvyuPQwBBt0u7S32aXxxt9VVgtaHd/exec";
-const API_KEY = "AST_2025_SECURE";
+const API_KEY = "AST Web App 2026";
 
 // URL BASE DE TU GITHUB
 const GITHUB_BASE_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/share/";
