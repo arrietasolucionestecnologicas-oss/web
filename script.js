@@ -47,7 +47,7 @@ async function fetchData() {
     } catch (error) { console.error(error); handleError(servicesContainer, storeContainer); }
 }
 
-function renderServices(items, container) {
+ renderServices(items, container) {
     container.innerHTML = '';
     if (items.length === 0) { container.innerHTML = `<div class="col-12 text-center text-muted"><p>Próximamente.</p></div>`; return; }
     
@@ -87,7 +87,7 @@ function renderServices(items, container) {
     });
 }
 
-function renderStore(items, container) {
+ renderStore(items, container) {
     container.innerHTML = '';
     if (items.length === 0) { container.innerHTML = `<div class="col-12 text-center text-muted"><p>Próximamente.</p></div>`; return; }
     
@@ -127,7 +127,7 @@ function renderStore(items, container) {
     });
 }
 
-function generateGitHubLink(name) {
+ generateGitHubLink(name) {
     const cleanSlug = name.toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
         .replace(/[^a-z0-9]/g, '-') 
@@ -136,14 +136,13 @@ function generateGitHubLink(name) {
     return `${GITHUB_BASE_URL}${cleanSlug}.html`;
 }
 
-function copyToClipboard(text) {
+ copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         alert(`✅ Enlace copiado!\n\nPégalo en WhatsApp.`);
     }).catch(err => {
         prompt("Copia este enlace:", text);
     });
 }
-
 function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
@@ -160,7 +159,6 @@ function openProductModal(uuid) {
     const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar el servicio:' : 'estoy interesado en comprar:';
     document.getElementById('modal-p-btn').href = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
 
-    // BOTÓN DENTRO DEL MODAL (AQUÍ SÍ VISIBLE Y CLARO)
     const githubLink = generateGitHubLink(p.nombre);
     const btnShare = document.getElementById('modal-p-share');
     const newBtn = btnShare.cloneNode(true);
@@ -170,7 +168,8 @@ function openProductModal(uuid) {
     newBtn.removeAttribute('target');
     btnShare.parentNode.replaceChild(newBtn, btnShare);
 
-    new bootstrap.Modal(document.getElementById('productModal')).show();
+    // CAMBIO: getOrCreateInstance en lugar de new bootstrap.Modal()
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('productModal')).show();
 }
 
 function handleError(c1, c2) {
