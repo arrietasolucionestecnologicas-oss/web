@@ -1036,12 +1036,34 @@
                         <h3 id="modal-p-name">Nombre</h3>
                         <h4 id="modal-p-price">$0</h4>
                         <div class="modal-specs-box" id="modal-p-specs">—</div>
+                        <!-- Panel compartir — solo aparece si publicadoGitHub:true -->
+                        <div id="modal-share-panel" style="display:none; margin-bottom:10px; padding:12px; background:rgba(0,200,255,0.05); border:1px solid rgba(0,200,255,0.15); border-radius:8px;">
+                            <div style="font-size:0.62rem; color:#4A6680; font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px;">
+                                <i class="bi bi-share-fill me-1"></i> Compartir este producto
+                            </div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <button onclick="shareProduct('copy')" id="btn-share-copy"
+                                    style="flex:1; min-width:80px; background:rgba(0,200,255,0.1); border:1px solid rgba(0,200,255,0.3); color:#00C8FF; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:600; padding:9px 6px; border-radius:6px; cursor:pointer; transition:all 0.2s;">
+                                    <i class="bi bi-link-45deg"></i> Copiar link
+                                </button>
+                                <button onclick="shareProduct('facebook')"
+                                    style="flex:1; min-width:80px; background:#1877F2; border:none; color:#fff; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:600; padding:9px 6px; border-radius:6px; cursor:pointer;">
+                                    <i class="bi bi-facebook"></i> Facebook
+                                </button>
+                                <button onclick="shareProduct('whatsapp')"
+                                    style="flex:1; min-width:80px; background:#25D366; border:none; color:#fff; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:600; padding:9px 6px; border-radius:6px; cursor:pointer;">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp
+                                </button>
+                                <button onclick="shareProduct('native')" id="btn-share-native"
+                                    style="display:none; background:#0A1A2E; border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:0.72rem; padding:9px 12px; border-radius:6px; cursor:pointer;">
+                                    <i class="bi bi-share-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-2 mt-auto">
-                            <button id="modal-p-share" class="btn-modal-share" style="display:none;">
-                                <i class="bi bi-link-45deg"></i> Copiar link
-                            </button>
-                            <a id="modal-p-btn" href="#" target="_blank" class="btn-modal-wa">
-                                <i class="bi bi-whatsapp"></i> Consultar
+                            <a id="modal-p-btn" href="#" target="_blank" class="btn-modal-wa" style="flex:1;">
+                                <i class="bi bi-whatsapp"></i> Consultar por WhatsApp
                             </a>
                         </div>
                     </div>
