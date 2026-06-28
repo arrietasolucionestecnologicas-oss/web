@@ -1,160 +1,254 @@
 // ==========================================
-// CONFIGURACIÓN FRONTEND (V14 - BOTÓN FANTASMA)
+// A.S.T. WEB PÚBLICA — script.js v15
+// Bugs corregidos: toast, modal-title,
+// publicadoGitHub check, placeholder SVG
 // ==========================================
+
 const API_URL = "https://script.google.com/macros/s/AKfycbxpCp7aY4L48znjtqH_1svYzY6MjVY58bXxt3iZvyuPQwBBt0u7S32aXxxt9VVgtaHd/exec";
 const API_KEY = "AST Web App 2026";
-
 const GITHUB_BASE_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/share/";
-
-const DEFAULT_IMG_SERVICE = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600';
-const DEFAULT_IMG_PRODUCT = 'https://via.placeholder.com/600x400?text=AST+Producto';
 
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 let globalCatalog = [];
 
-document.addEventListener('DOMContentLoaded', () => { fetchData(); });
+// Placeholder SVG inline — sin dependencias externas
+const SVG_PLACEHOLDER_PRODUCT = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E📦%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Producto%3C/text%3E%3C/svg%3E`;
+const SVG_PLACEHOLDER_SERVICE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E⚙️%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Servicio%3C/text%3E%3C/svg%3E`;
 
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg, icon = 'bi-check-circle-fill') {
+    const container = document.getElementById('ast-toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'ast-toast';
+    toast.innerHTML = `<i class="bi ${icon}"></i> <span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    fetchData();
+});
+
+// ── FETCH DATA ────────────────────────────────────────────────
 async function fetchData() {
-    const servicesContainer = document.getElementById('services-grid');
-    const storeContainer = document.getElementById('store-grid');
-    if(servicesContainer) servicesContainer.innerHTML = '<div class="col-12 text-center text-white"><div class="spinner-border text-primary" role="status"></div><p>Cargando Servicios...</p></div>';
     try {
         const response = await fetch(API_URL, {
-            method: 'POST', redirect: "follow", headers: { "Content-Type": "text/plain;charset=utf-8" },
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'getPublicCatalog', auth: API_KEY, payload: {} })
         });
         const result = await response.json();
+
         if (result.success) {
             globalCatalog = result.data;
             const services = globalCatalog.filter(item => item.tipo === 'SERVICIO');
             const products = globalCatalog.filter(item => item.tipo === 'PRODUCTO');
-            renderServices(services, servicesContainer);
-            renderStore(products, storeContainer);
-            const urlParams = new URLSearchParams(window.location.search);
-            const openId = urlParams.get('open');
+
+            renderServices(services, document.getElementById('services-grid'));
+            renderStore(products, document.getElementById('store-grid'));
+
+            // Auto-abrir modal si viene ?open=uuid
+            const openId = new URLSearchParams(window.location.search).get('open');
             if (openId) {
                 window.history.replaceState({}, document.title, window.location.pathname);
-                setTimeout(() => openProductModal(openId), 800);
+                setTimeout(() => openProductModal(openId), 600);
             }
-        } else { handleError(servicesContainer, storeContainer); }
-    } catch (error) { console.error(error); handleError(servicesContainer, storeContainer); }
+        } else {
+            handleError();
+        }
+    } catch (error) {
+        console.error('Error cargando catálogo:', error);
+        handleError();
+    }
 }
 
+// ── RENDER SERVICIOS ──────────────────────────────────────────
 function renderServices(items, container) {
+    if (!container) return;
     container.innerHTML = '';
-    if (items.length === 0) { container.innerHTML = `<div class="col-12 text-center text-muted"><p>Próximamente.</p></div>`; return; }
+
+    if (items.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-5" style="color:var(--text2);">
+            <i class="bi bi-tools" style="font-size:2rem;"></i>
+            <p class="mt-2 small">Próximamente.</p>
+        </div>`;
+        return;
+    }
+
     items.forEach(s => {
-        const img = s.imagen && s.imagen.startsWith('http') ? s.imagen : DEFAULT_IMG_SERVICE;
-        const githubLink = generateGitHubLink(s.nombre);
-        const html = `
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="tech-card h-100 overflow-hidden p-0 d-flex flex-column" onclick="openProductModal('${s.uuid}')" style="cursor: pointer; border: 1px solid #333; border-radius: 10px; background: #1a1a1a;">
-                <div style="height: 180px; overflow: hidden; position: relative;">
-                    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent, rgba(30, 41, 59, 0.8));"></div>
-                    <img src="${img}" style="width:100%; height:100%; object-fit: cover;">
-                    <button class="btn btn-dark rounded-circle position-absolute top-0 end-0 m-2 shadow-sm" 
-                            style="width:35px; height:35px; padding:0; opacity:0.7; border:1px solid #555; z-index:10;" 
-                            onclick="event.stopPropagation(); copyToClipboard('${githubLink}')" 
-                            title="Copiar Enlace">
-                        <i class="bi bi-link-45deg text-white fs-5"></i>
+        const img     = s.imagen && s.imagen.startsWith('http') ? s.imagen : SVG_PLACEHOLDER_SERVICE;
+        const hasLink = s.publicadoGitHub === true;
+        const gitLink = generateGitHubLink(s.nombre);
+
+        const shareBtn = hasLink
+            ? `<button class="service-share-btn" onclick="event.stopPropagation(); copyLink('${gitLink}')" title="Copiar enlace compartible">
+                   <i class="bi bi-link-45deg"></i>
+               </button>`
+            : '';
+
+        const card = document.createElement('div');
+        card.className = 'col-md-6 col-lg-3';
+        card.innerHTML = `
+            <div class="service-card" onclick="openProductModal('${s.uuid}')">
+                <div class="service-card-img">
+                    <img src="${img}" alt="${s.nombre}" loading="lazy" onerror="this.src='${SVG_PLACEHOLDER_SERVICE}'">
+                    <div class="service-card-img-overlay"></div>
+                    ${shareBtn}
+                </div>
+                <div class="service-card-body">
+                    <div class="service-badge"><span></span> DISPONIBLE</div>
+                    <div class="service-card-title">${s.nombre}</div>
+                    <div class="service-card-desc">${s.specs || 'Solución profesional garantizada.'}</div>
+                    <button class="btn-service">
+                        <i class="bi bi-whatsapp"></i> Cotizar este servicio
                     </button>
                 </div>
-                <div class="p-3 d-flex flex-column flex-grow-1">
-                    <h5 class="text-white fw-bold mb-2">${s.nombre}</h5>
-                    <p class="text-secondary small flex-grow-1 mb-3" style="line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${s.specs || 'Solución profesional garantizada.'}</p>
-                    <div class="mt-auto">
-                        <a href="https://wa.me/573137713430?text=Hola%20A.S.T.,%20me%20interesa%20el%20servicio:%20${encodeURIComponent(s.nombre)}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill w-100" onclick="event.stopPropagation()">
-                            <i class="bi bi-whatsapp"></i> Cotizar
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-        container.innerHTML += html;
+            </div>`;
+        container.appendChild(card);
     });
 }
 
+// ── RENDER STORE ──────────────────────────────────────────────
 function renderStore(items, container) {
+    if (!container) return;
     container.innerHTML = '';
-    if (items.length === 0) { container.innerHTML = `<div class="col-12 text-center text-muted"><p>Próximamente.</p></div>`; return; }
+
+    if (items.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-5" style="color:var(--text2);">
+            <i class="bi bi-box-seam" style="font-size:2rem;"></i>
+            <p class="mt-2 small">Próximamente.</p>
+        </div>`;
+        return;
+    }
+
     items.forEach(p => {
-        const imageSrc = p.imagen && p.imagen.startsWith('http') ? p.imagen : DEFAULT_IMG_PRODUCT;
-        const githubLink = generateGitHubLink(p.nombre);
-        const html = `
-        <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
-            <div class="product-card h-100 d-flex flex-column" onclick="openProductModal('${p.uuid}')" style="background: #111; border: 1px solid #333; border-radius: 8px; overflow: hidden;">
-                <div class="product-img-wrapper" style="height: 200px; overflow: hidden; background: #000; position: relative;">
-                    <img src="${imageSrc}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: contain;">
-                    <button class="btn btn-dark rounded-circle position-absolute top-0 end-0 m-2 shadow-sm" 
-                            style="width:35px; height:35px; padding:0; opacity:0.7; border:1px solid #555; z-index:10;" 
-                            onclick="event.stopPropagation(); copyToClipboard('${githubLink}')" 
-                            title="Copiar Enlace">
-                        <i class="bi bi-link-45deg text-white fs-5"></i>
+        const img     = p.imagen && p.imagen.startsWith('http') ? p.imagen : SVG_PLACEHOLDER_PRODUCT;
+        const hasLink = p.publicadoGitHub === true;
+        const gitLink = generateGitHubLink(p.nombre);
+
+        const shareBtn = hasLink
+            ? `<button class="product-share-btn" onclick="event.stopPropagation(); copyLink('${gitLink}')" title="Copiar enlace">
+                   <i class="bi bi-link-45deg"></i>
+               </button>`
+            : '';
+
+        const priceStr = p.precio && p.precio > 0 ? fmt.format(p.precio) : 'Cotizar';
+        const catLabel = (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+
+        const card = document.createElement('div');
+        card.className = 'col-6 col-md-4 col-lg-3';
+        card.innerHTML = `
+            <div class="product-card-pub" onclick="openProductModal('${p.uuid}')">
+                <div class="product-card-img">
+                    <img src="${img}" alt="${p.nombre}" loading="lazy" onerror="this.src='${SVG_PLACEHOLDER_PRODUCT}'">
+                    ${shareBtn}
+                </div>
+                <div class="product-card-body">
+                    <div class="product-cat-badge">${catLabel}</div>
+                    <div class="product-card-name" title="${p.nombre}">${p.nombre}</div>
+                    <div class="product-card-specs">${p.specs || '—'}</div>
+                    <div class="product-card-price">${priceStr}</div>
+                    <button class="btn-product-detail">
+                        Ver detalles <i class="bi bi-arrow-right-short"></i>
                     </button>
                 </div>
-                <div class="p-3 d-flex flex-column flex-grow-1">
-                    <div class="mb-1"><span class="badge bg-secondary" style="font-size: 0.6rem;">${p.categoria || 'HARDWARE'}</span></div>
-                    <h6 class="text-white fw-bold mb-2 text-truncate" title="${p.nombre}">${p.nombre}</h6>
-                    <p class="text-info fw-bold mb-3" style="font-size: 1.1rem;">${fmt.format(p.precio)}</p>
-                    <div class="mt-auto pt-3 border-top border-secondary">
-                        <button class="btn btn-sm btn-primary-tech rounded-pill w-100">
-                            Ver Detalles <i class="bi bi-arrow-right-short"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-        container.innerHTML += html;
+            </div>`;
+        container.appendChild(card);
     });
 }
 
-function generateGitHubLink(name) {
-    const cleanSlug = name.toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-    return `${GITHUB_BASE_URL}${cleanSlug}.html`;
-}
-
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert(`✅ Enlace copiado!\n\nPégalo en WhatsApp.`);
-    }).catch(err => {
-        prompt("Copia este enlace:", text);
-    });
-}
-
+// ── ABRIR MODAL ───────────────────────────────────────────────
 function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
-    let finalImage = p.imagen && p.imagen.startsWith('http') ? p.imagen : null;
-    if (!finalImage) finalImage = p.tipo === 'SERVICIO' ? DEFAULT_IMG_SERVICE : DEFAULT_IMG_PRODUCT;
 
-    document.getElementById('modal-p-img').src = finalImage;
-    document.getElementById('modal-p-cat').innerText = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE');
-    document.getElementById('modal-p-name').innerText = p.nombre;
-    if (p.tipo === 'SERVICIO' && (!p.precio || p.precio === 0)) document.getElementById('modal-p-price').innerText = "Cotizar";
-    else document.getElementById('modal-p-price').innerText = fmt.format(p.precio);
+    // Imagen
+    const imgEl   = document.getElementById('modal-p-img');
+    const fallback = p.tipo === 'SERVICIO' ? SVG_PLACEHOLDER_SERVICE : SVG_PLACEHOLDER_PRODUCT;
+    imgEl.src     = (p.imagen && p.imagen.startsWith('http')) ? p.imagen : fallback;
+    imgEl.onerror = () => { imgEl.src = fallback; };
+
+    // BUG FIX: llenar el título del header del modal
+    document.getElementById('modal-p-title').innerText = p.nombre;
+
+    // Categoría, nombre, precio, specs
+    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+    document.getElementById('modal-p-name').innerText  = p.nombre;
+    document.getElementById('modal-p-price').innerText = (p.precio && p.precio > 0) ? fmt.format(p.precio) : 'Precio a cotizar';
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
 
-    const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar el servicio:' : 'estoy interesado en comprar:';
-    document.getElementById('modal-p-btn').href = `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
+    // Botón WhatsApp
+    const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar el servicio:' : 'estoy interesado en:';
+    document.getElementById('modal-p-btn').href =
+        `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
 
-    const githubLink = generateGitHubLink(p.nombre);
-    const btnShare = document.getElementById('modal-p-share');
-    const newBtn = btnShare.cloneNode(true);
-    newBtn.innerHTML = '<i class="bi bi-link-45deg me-2"></i> Copiar Link';
-    newBtn.onclick = (e) => { e.preventDefault(); copyToClipboard(githubLink); };
-    newBtn.removeAttribute('href');
-    newBtn.removeAttribute('target');
-    btnShare.parentNode.replaceChild(newBtn, btnShare);
+    // BUG FIX: botón compartir solo si publicadoGitHub es true
+    const shareBtn = document.getElementById('modal-p-share');
+    if (p.publicadoGitHub === true) {
+        const gitLink = generateGitHubLink(p.nombre);
+        shareBtn.style.display = 'flex';
+        shareBtn.onclick = (e) => { e.preventDefault(); copyLink(gitLink); };
+    } else {
+        shareBtn.style.display = 'none';
+    }
+
+    // GA4 tracking
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'view_item', { item_name: p.nombre, item_category: p.tipo });
+    }
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('productModal')).show();
 }
 
-function handleError(c1, c2) {
-    const err = `<div class="col-12 text-center text-danger"><p>Error de conexión.</p></div>`;
-    if(c1) c1.innerHTML = err;
-    if(c2) c2.innerHTML = err;
+// ── HELPERS ───────────────────────────────────────────────────
+function generateGitHubLink(name) {
+    const slug = name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    return `${GITHUB_BASE_URL}${slug}.html`;
+}
+
+function copyLink(url) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('¡Enlace copiado! Pégalo donde quieras.', 'bi-link-45deg');
+        }).catch(() => fallbackCopy(url));
+    } else {
+        fallbackCopy(url);
+    }
+}
+
+function fallbackCopy(url) {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.cssText = 'position:fixed;top:-9999px;';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand('copy');
+        showToast('¡Enlace copiado!', 'bi-link-45deg');
+    } catch {
+        showToast('Copia este link: ' + url, 'bi-exclamation-circle');
+    }
+    document.body.removeChild(ta);
+}
+
+function handleError() {
+    const err = `<div class="col-12 text-center py-5" style="color:#ff4444;">
+        <i class="bi bi-wifi-off" style="font-size:2rem;"></i>
+        <p class="mt-2 small">Error de conexión. Intenta recargar la página.</p>
+    </div>`;
+    const sg = document.getElementById('services-grid');
+    const pg = document.getElementById('store-grid');
+    if (sg) sg.innerHTML = err;
+    if (pg) pg.innerHTML = err;
 }
