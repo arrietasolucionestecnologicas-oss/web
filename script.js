@@ -9,7 +9,9 @@ const API_KEY = "AST Web App 2026";
 const GITHUB_BASE_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/share/";
 
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
-let globalCatalog = [];
+let globalCatalog        = [];
+let currentShareUrl      = '';
+let currentShareProduct  = null;
 
 // Placeholder SVG inline — sin dependencias externas
 const SVG_PLACEHOLDER_PRODUCT = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E📦%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Producto%3C/text%3E%3C/svg%3E`;
@@ -169,44 +171,107 @@ function openProductModal(uuid) {
     const p = globalCatalog.find(item => item.uuid === uuid);
     if (!p) return;
 
+    currentShareProduct = p;
+
     // Imagen
     const imgEl   = document.getElementById('modal-p-img');
     const fallback = p.tipo === 'SERVICIO' ? SVG_PLACEHOLDER_SERVICE : SVG_PLACEHOLDER_PRODUCT;
     imgEl.src     = (p.imagen && p.imagen.startsWith('http')) ? p.imagen : fallback;
     imgEl.onerror = () => { imgEl.src = fallback; };
 
-    // BUG FIX: llenar el título del header del modal
+    // Título header
     document.getElementById('modal-p-title').innerText = p.nombre;
 
-    // Categoría, nombre, precio, specs
+    // Datos
     document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE').replace(/_/g, ' ');
     document.getElementById('modal-p-name').innerText  = p.nombre;
     document.getElementById('modal-p-price').innerText = (p.precio && p.precio > 0) ? fmt.format(p.precio) : 'Precio a cotizar';
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
 
-    // Botón WhatsApp
+    // WhatsApp consultar
     const actionText = p.tipo === 'SERVICIO' ? 'me interesa cotizar el servicio:' : 'estoy interesado en:';
     document.getElementById('modal-p-btn').href =
         `https://wa.me/573137713430?text=Hola%20A.S.T.,%20${actionText}%20${encodeURIComponent(p.nombre)}`;
 
-    // BUG FIX: botón compartir solo si publicadoGitHub es true
-    const shareBtn = document.getElementById('modal-p-share');
-    if (p.publicadoGitHub === true) {
-        const gitLink = generateGitHubLink(p.nombre);
-        shareBtn.style.display = 'flex';
-        shareBtn.onclick = (e) => { e.preventDefault(); copyLink(gitLink); };
-    } else {
-        shareBtn.style.display = 'none';
+    // Panel compartir
+    const sharePanel  = document.getElementById('modal-share-panel');
+    const nativeBtn   = document.getElementById('btn-share-native');
+    const copyBtn     = document.getElementById('btn-share-copy');
+
+    // Resetear botón copiar
+    if (copyBtn) {
+        copyBtn.innerHTML  = '<i class="bi bi-link-45deg"></i> Copiar link';
+        copyBtn.style.background   = 'rgba(0,200,255,0.1)';
+        copyBtn.style.borderColor  = 'rgba(0,200,255,0.3)';
+        copyBtn.style.color        = '#00C8FF';
     }
 
-    // GA4 tracking
+    if (p.publicadoGitHub === true) {
+        currentShareUrl        = generateGitHubLink(p.nombre);
+        sharePanel.style.display = 'block';
+        if (nativeBtn) {
+            nativeBtn.style.display = navigator.share ? 'block' : 'none';
+        }
+    } else {
+        currentShareUrl          = '';
+        sharePanel.style.display = 'none';
+    }
+
+    // GA4
     if (typeof gtag !== 'undefined') {
         gtag('event', 'view_item', { item_name: p.nombre, item_category: p.tipo });
     }
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('productModal')).show();
 }
+function shareProduct(type) {
+    if (!currentShareUrl) return;
+    const p      = currentShareProduct;
+    const nombre = p ? p.nombre : 'Producto A.S.T.';
+    const precio = (p && p.precio > 0) ? fmt.format(p.precio) : 'Precio a cotizar';
 
+    if (type === 'copy') {
+        copyLink(currentShareUrl);
+        const btn = document.getElementById('btn-share-copy');
+        if (btn) {
+            btn.innerHTML          = '<i class="bi bi-check-lg"></i> ¡Copiado!';
+            btn.style.background   = 'rgba(0,230,118,0.15)';
+            btn.style.borderColor  = '#00E676';
+            btn.style.color        = '#00E676';
+            setTimeout(() => {
+                btn.innerHTML          = '<i class="bi bi-link-45deg"></i> Copiar link';
+                btn.style.background   = 'rgba(0,200,255,0.1)';
+                btn.style.borderColor  = 'rgba(0,200,255,0.3)';
+                btn.style.color        = '#00C8FF';
+            }, 2500);
+        }
+
+    } else if (type === 'facebook') {
+        const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentShareUrl)}`;
+        window.open(fbUrl, '_blank', 'width=620,height=450,left=200,top=100');
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'share', { method: 'Facebook', content_type: 'product', item_id: nombre });
+        }
+
+    } else if (type === 'whatsapp') {
+        const texto = `🏢 *A.S.T. Soluciones Tecnológicas*\n\n📦 *${nombre}*\n💰 ${precio}\n\nVe todos los detalles aquí 👇\n${currentShareUrl}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'share', { method: 'WhatsApp', content_type: 'product', item_id: nombre });
+        }
+
+    } else if (type === 'native') {
+        if (navigator.share) {
+            navigator.share({
+                title: `${nombre} | A.S.T. Soluciones`,
+                text:  `${nombre} — ${precio}`,
+                url:   currentShareUrl
+            }).catch(e => {
+                if (e.name !== 'AbortError') copyLink(currentShareUrl);
+            });
+        }
+    }
+}
 // ── HELPERS ───────────────────────────────────────────────────
 function generateGitHubLink(name) {
     const slug = name.toLowerCase()
