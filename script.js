@@ -1,7 +1,8 @@
 // ==========================================
 // A.S.T. WEB PÚBLICA — script.js v15
 // Bugs corregidos: toast, modal-title,
-// publicadoGitHub check, placeholder SVG
+// publicadoGitHub check, placeholder SVG,
+// share panel logic.
 // ==========================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxpCp7aY4L48znjtqH_1svYzY6MjVY58bXxt3iZvyuPQwBBt0u7S32aXxxt9VVgtaHd/exec";
@@ -86,7 +87,7 @@ function renderServices(items, container) {
 
     items.forEach(s => {
         const img     = s.imagen && s.imagen.startsWith('http') ? s.imagen : SVG_PLACEHOLDER_SERVICE;
-        const hasLink = s.publicadoGitHub === true;
+        const hasLink = s.publicadoGitHub === true || String(s.publicadoGitHub).toLowerCase() === 'true';
         const gitLink = generateGitHubLink(s.nombre);
 
         const shareBtn = hasLink
@@ -132,7 +133,7 @@ function renderStore(items, container) {
 
     items.forEach(p => {
         const img     = p.imagen && p.imagen.startsWith('http') ? p.imagen : SVG_PLACEHOLDER_PRODUCT;
-        const hasLink = p.publicadoGitHub === true;
+        const hasLink = p.publicadoGitHub === true || String(p.publicadoGitHub).toLowerCase() === 'true';
         const gitLink = generateGitHubLink(p.nombre);
 
         const shareBtn = hasLink
@@ -206,7 +207,9 @@ function openProductModal(uuid) {
         copyBtn.style.color        = '#00C8FF';
     }
 
-    if (p.publicadoGitHub === true) {
+    const hasLink = p.publicadoGitHub === true || String(p.publicadoGitHub).toLowerCase() === 'true';
+
+    if (hasLink) {
         currentShareUrl        = generateGitHubLink(p.nombre);
         sharePanel.style.display = 'block';
         if (nativeBtn) {
@@ -224,6 +227,8 @@ function openProductModal(uuid) {
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('productModal')).show();
 }
+
+// ── COMPARTIR PRODUCTO ────────────────────────────────────────
 function shareProduct(type) {
     if (!currentShareUrl) return;
     const p      = currentShareProduct;
@@ -272,6 +277,7 @@ function shareProduct(type) {
         }
     }
 }
+
 // ── HELPERS ───────────────────────────────────────────────────
 function generateGitHubLink(name) {
     const slug = name.toLowerCase()
