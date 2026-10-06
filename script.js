@@ -59,7 +59,7 @@ async function fetchData() {
 
             // Los servicios de la página son fijos (index.html). El catálogo del admin solo los pinta si se activa la bandera.
             if (AST_CONFIG.MOSTRAR_SERVICIOS_DEL_CATALOGO) renderServices(services, document.getElementById('services-grid'));
-            renderStore(products, document.getElementById('store-grid'));
+            if (AST_CONFIG.MOSTRAR_TIENDA) renderStore(products, document.getElementById('store-grid'));
 
             // Auto-abrir modal si viene ?open=uuid
             const openId = new URLSearchParams(window.location.search).get('open');
