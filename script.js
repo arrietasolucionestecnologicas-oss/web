@@ -1,5 +1,5 @@
 // ==========================================
-// A.S.T. WEB PÚBLICA — script.js v15
+// A.S.T. WEB PÚBLICA: script.js v15
 // Bugs corregidos: toast, modal-title,
 // publicadoGitHub check, placeholder SVG,
 // share panel logic.
@@ -9,12 +9,15 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxpCp7aY4L48znjtqH_1svY
 const API_KEY = "AST Web App 2026";
 const GITHUB_BASE_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/share/";
 
+// Banderas definidas en index.html (window.AST_CONFIG). Valores por defecto por si faltan.
+const AST_CONFIG = Object.assign({ MOSTRAR_TIENDA: true, MOSTRAR_SERVICIOS_DEL_CATALOGO: false }, window.AST_CONFIG || {});
+
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 let globalCatalog        = [];
 let currentShareUrl      = '';
 let currentShareProduct  = null;
 
-// Placeholder SVG inline — sin dependencias externas
+// Placeholder SVG inline, sin dependencias externas
 const SVG_PLACEHOLDER_PRODUCT = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E📦%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Producto%3C/text%3E%3C/svg%3E`;
 const SVG_PLACEHOLDER_SERVICE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E⚙️%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Servicio%3C/text%3E%3C/svg%3E`;
 
@@ -38,6 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchData();
 });
 
+// Medir clics en cualquier enlace a WhatsApp (GA4, ya cargado en index.html)
+document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]');
+    if (a && typeof gtag !== 'undefined') {
+        gtag('event', 'click_whatsapp', { link_text: (a.innerText || '').trim().slice(0, 60) || 'whatsapp' });
+    }
+});
+
 // ── FETCH DATA ────────────────────────────────────────────────
 async function fetchData() {
     try {
@@ -54,8 +65,9 @@ async function fetchData() {
             const services = globalCatalog.filter(item => item.tipo === 'SERVICIO');
             const products = globalCatalog.filter(item => item.tipo === 'PRODUCTO');
 
-            renderServices(services, document.getElementById('services-grid'));
-            renderStore(products, document.getElementById('store-grid'));
+            // Los servicios de la página son fijos (index.html). El catálogo del admin solo los pinta si se activa la bandera.
+            if (AST_CONFIG.MOSTRAR_SERVICIOS_DEL_CATALOGO) renderServices(services, document.getElementById('services-grid'));
+            if (AST_CONFIG.MOSTRAR_TIENDA) renderStore(products, document.getElementById('store-grid'));
 
             // Auto-abrir modal si viene ?open=uuid
             const openId = new URLSearchParams(window.location.search).get('open');
@@ -108,7 +120,7 @@ function renderServices(items, container) {
                 <div class="service-card-body">
                     <div class="service-badge"><span></span> DISPONIBLE</div>
                     <div class="service-card-title">${s.nombre}</div>
-                    <div class="service-card-desc">${s.specs || 'Solución profesional garantizada.'}</div>
+                    <div class="service-card-desc">${s.specs || 'Cotiza este servicio por WhatsApp.'}</div>
                     <button class="btn-service">
                         <i class="bi bi-whatsapp"></i> Cotizar este servicio
                     </button>
@@ -143,7 +155,7 @@ function renderStore(items, container) {
             : '';
 
         const priceStr = p.precio && p.precio > 0 ? fmt.format(p.precio) : 'Cotizar';
-        const catLabel = (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+        const catLabel = etiquetaCategoria(p.categoria);
 
         const card = document.createElement('div');
         card.className = 'col-6 col-md-4 col-lg-3';
@@ -156,7 +168,7 @@ function renderStore(items, container) {
                 <div class="product-card-body">
                     <div class="product-cat-badge">${catLabel}</div>
                     <div class="product-card-name" title="${p.nombre}">${p.nombre}</div>
-                    <div class="product-card-specs">${p.specs || '—'}</div>
+                    <div class="product-card-specs">${p.specs || 'Consulta los detalles por WhatsApp'}</div>
                     <div class="product-card-price">${priceStr}</div>
                     <button class="btn-product-detail">
                         Ver detalles <i class="bi bi-arrow-right-short"></i>
@@ -184,7 +196,7 @@ function openProductModal(uuid) {
     document.getElementById('modal-p-title').innerText = p.nombre;
 
     // Datos
-    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO' : etiquetaCategoria(p.categoria);
     document.getElementById('modal-p-name').innerText  = p.nombre;
     document.getElementById('modal-p-price').innerText = (p.precio && p.precio > 0) ? fmt.format(p.precio) : 'Precio a cotizar';
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
@@ -259,7 +271,7 @@ function shareProduct(type) {
         }
 
     } else if (type === 'whatsapp') {
-        const texto = `🏢 *A.S.T. Soluciones Tecnológicas*\n\n📦 *${nombre}*\n💰 ${precio}\n\nVe todos los detalles aquí 👇\n${currentShareUrl}`;
+        const texto = `🏢 *A.S.T. Soluciones Técnicas*\n\n📦 *${nombre}*\n💰 ${precio}\n\nVe todos los detalles aquí 👇\n${currentShareUrl}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
         if (typeof gtag !== 'undefined') {
             gtag('event', 'share', { method: 'WhatsApp', content_type: 'product', item_id: nombre });
@@ -268,8 +280,8 @@ function shareProduct(type) {
     } else if (type === 'native') {
         if (navigator.share) {
             navigator.share({
-                title: `${nombre} | A.S.T. Soluciones`,
-                text:  `${nombre} — ${precio}`,
+                title: `${nombre} | A.S.T. Soluciones Técnicas`,
+                text:  `${nombre}: ${precio}`,
                 url:   currentShareUrl
             }).catch(e => {
                 if (e.name !== 'AbortError') copyLink(currentShareUrl);
@@ -279,6 +291,18 @@ function shareProduct(type) {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
+// Etiqueta visible de la categoría (solo texto en pantalla; el campo del catálogo no cambia)
+const CATEGORIAS_ETIQUETA = {
+    AUTOMATIZACION_APPS: 'AUTOMATIZACIÓN',
+    DOMOTICA_HOGAR: 'DOMÓTICA Y HOGAR',
+    ELECTRICIDAD_RESIDENCIAL: 'ELECTRICIDAD RESIDENCIAL',
+    MANTENIMIENTO_INDUSTRIAL: 'MANTENIMIENTO INDUSTRIAL'
+};
+function etiquetaCategoria(c) {
+    const k = c || 'HARDWARE';
+    return CATEGORIAS_ETIQUETA[k] || String(k).replace(/_/g, ' ');
+}
+
 function generateGitHubLink(name) {
     const slug = name.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -320,6 +344,6 @@ function handleError() {
     </div>`;
     const sg = document.getElementById('services-grid');
     const pg = document.getElementById('store-grid');
-    if (sg) sg.innerHTML = err;
+    if (sg && AST_CONFIG.MOSTRAR_SERVICIOS_DEL_CATALOGO) sg.innerHTML = err;
     if (pg) pg.innerHTML = err;
 }
