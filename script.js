@@ -112,7 +112,7 @@ function renderServices(items, container) {
                 <div class="service-card-body">
                     <div class="service-badge"><span></span> DISPONIBLE</div>
                     <div class="service-card-title">${s.nombre}</div>
-                    <div class="service-card-desc">${s.specs || 'Solución profesional garantizada.'}</div>
+                    <div class="service-card-desc">${s.specs || 'Cotiza este servicio por WhatsApp.'}</div>
                     <button class="btn-service">
                         <i class="bi bi-whatsapp"></i> Cotizar este servicio
                     </button>
@@ -188,7 +188,7 @@ function openProductModal(uuid) {
     document.getElementById('modal-p-title').innerText = p.nombre;
 
     // Datos
-    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO PROFESIONAL' : (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO' : (p.categoria || 'HARDWARE').replace(/_/g, ' ');
     document.getElementById('modal-p-name').innerText  = p.nombre;
     document.getElementById('modal-p-price').innerText = (p.precio && p.precio > 0) ? fmt.format(p.precio) : 'Precio a cotizar';
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
