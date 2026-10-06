@@ -1,5 +1,5 @@
 // ==========================================
-// A.S.T. WEB PÚBLICA — script.js v15
+// A.S.T. WEB PÚBLICA: script.js v15
 // Bugs corregidos: toast, modal-title,
 // publicadoGitHub check, placeholder SVG,
 // share panel logic.
@@ -17,7 +17,7 @@ let globalCatalog        = [];
 let currentShareUrl      = '';
 let currentShareProduct  = null;
 
-// Placeholder SVG inline — sin dependencias externas
+// Placeholder SVG inline, sin dependencias externas
 const SVG_PLACEHOLDER_PRODUCT = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E📦%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Producto%3C/text%3E%3C/svg%3E`;
 const SVG_PLACEHOLDER_SERVICE = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230A1A2E'/%3E%3Ctext x='200' y='140' font-family='monospace' font-size='40' fill='%2300C8FF' text-anchor='middle'%3E⚙️%3C/text%3E%3Ctext x='200' y='175' font-family='monospace' font-size='13' fill='%234A6680' text-anchor='middle'%3EA.S.T. Servicio%3C/text%3E%3C/svg%3E`;
 
@@ -155,7 +155,7 @@ function renderStore(items, container) {
             : '';
 
         const priceStr = p.precio && p.precio > 0 ? fmt.format(p.precio) : 'Cotizar';
-        const catLabel = (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+        const catLabel = etiquetaCategoria(p.categoria);
 
         const card = document.createElement('div');
         card.className = 'col-6 col-md-4 col-lg-3';
@@ -168,7 +168,7 @@ function renderStore(items, container) {
                 <div class="product-card-body">
                     <div class="product-cat-badge">${catLabel}</div>
                     <div class="product-card-name" title="${p.nombre}">${p.nombre}</div>
-                    <div class="product-card-specs">${p.specs || '—'}</div>
+                    <div class="product-card-specs">${p.specs || 'Consulta los detalles por WhatsApp'}</div>
                     <div class="product-card-price">${priceStr}</div>
                     <button class="btn-product-detail">
                         Ver detalles <i class="bi bi-arrow-right-short"></i>
@@ -196,7 +196,7 @@ function openProductModal(uuid) {
     document.getElementById('modal-p-title').innerText = p.nombre;
 
     // Datos
-    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO' : (p.categoria || 'HARDWARE').replace(/_/g, ' ');
+    document.getElementById('modal-p-cat').innerText   = p.tipo === 'SERVICIO' ? 'SERVICIO' : etiquetaCategoria(p.categoria);
     document.getElementById('modal-p-name').innerText  = p.nombre;
     document.getElementById('modal-p-price').innerText = (p.precio && p.precio > 0) ? fmt.format(p.precio) : 'Precio a cotizar';
     document.getElementById('modal-p-specs').innerText = p.specs || 'Sin descripción detallada.';
@@ -281,7 +281,7 @@ function shareProduct(type) {
         if (navigator.share) {
             navigator.share({
                 title: `${nombre} | A.S.T. Soluciones Técnicas`,
-                text:  `${nombre} — ${precio}`,
+                text:  `${nombre}: ${precio}`,
                 url:   currentShareUrl
             }).catch(e => {
                 if (e.name !== 'AbortError') copyLink(currentShareUrl);
@@ -291,6 +291,18 @@ function shareProduct(type) {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
+// Etiqueta visible de la categoría (solo texto en pantalla; el campo del catálogo no cambia)
+const CATEGORIAS_ETIQUETA = {
+    AUTOMATIZACION_APPS: 'AUTOMATIZACIÓN',
+    DOMOTICA_HOGAR: 'DOMÓTICA Y HOGAR',
+    ELECTRICIDAD_RESIDENCIAL: 'ELECTRICIDAD RESIDENCIAL',
+    MANTENIMIENTO_INDUSTRIAL: 'MANTENIMIENTO INDUSTRIAL'
+};
+function etiquetaCategoria(c) {
+    const k = c || 'HARDWARE';
+    return CATEGORIAS_ETIQUETA[k] || String(k).replace(/_/g, ' ');
+}
+
 function generateGitHubLink(name) {
     const slug = name.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
