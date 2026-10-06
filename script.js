@@ -41,6 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchData();
 });
 
+// Medir clics en cualquier enlace a WhatsApp (GA4, ya cargado en index.html)
+document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]');
+    if (a && typeof gtag !== 'undefined') {
+        gtag('event', 'click_whatsapp', { link_text: (a.innerText || '').trim().slice(0, 60) || 'whatsapp' });
+    }
+});
+
 // ── FETCH DATA ────────────────────────────────────────────────
 async function fetchData() {
     try {

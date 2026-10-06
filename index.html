@@ -706,10 +706,36 @@
         }
         .btn-modal-share:hover { background: rgba(0,200,255,0.15); }
 
+        /* ── BOTÓN FLOTANTE WHATSAPP ────────────────── */
+        .wa-float {
+            position: fixed;
+            right: 16px; bottom: 16px;
+            z-index: 1040;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            min-width: 58px; height: 58px;
+            padding: 0 18px;
+            background: #25D366;
+            color: #fff;
+            border-radius: 999px;
+            font-family: var(--ff);
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .wa-float i { font-size: 1.7rem; line-height: 1; }
+        .wa-float:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.5); }
+        .footer-inline-link { color: inherit; transition: color 0.2s; }
+        .footer-inline-link:hover { color: var(--c); }
+        @media (max-width: 575px) {
+            .wa-float { padding: 0; width: 58px; }
+            .wa-float span { display: none; }
+        }
+
         /* ── TOAST ──────────────────────────────────── */
         #ast-toast-container {
             position: fixed;
-            bottom: 24px; right: 24px;
+            bottom: 92px; right: 20px;
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -753,7 +779,7 @@
             .hero h1 { font-size: 2rem; }
             .hero p.lead { font-size: 0.92rem; }
             .trust-item + .trust-item { border-left: none; border-top: 1px solid var(--border); }
-            #ast-toast-container { bottom: 16px; right: 16px; left: 16px; }
+            #ast-toast-container { bottom: 88px; right: 16px; left: 16px; }
             .ast-toast { min-width: unset; }
         }
         @media (max-width: 575px) {
@@ -805,7 +831,7 @@
                 <li class="nav-item solo-tienda"><a class="nav-link" href="#tienda">Productos</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                 <li class="nav-item ms-lg-2">
-                    <a href="https://wa.me/573137713430?text=Hola%20A.S.T.,%20quiero%20una%20cotización" target="_blank" class="btn-cta-nav">
+                    <a href="https://wa.me/573137713430?text=Hola%2C%20quiero%20una%20cotizaci%C3%B3n" target="_blank" rel="noopener" class="btn-cta-nav">
                         <i class="bi bi-whatsapp me-1"></i> Cotizar
                     </a>
                 </li>
@@ -834,7 +860,7 @@
                     Instalamos paneles solares, cámaras de seguridad, cerraduras inteligentes y sistemas eléctricos para hogares, negocios e instituciones en Barranquilla y áreas cercanas. Trabajamos con criterio técnico.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="https://wa.me/573137713430?text=Hola%20A.S.T.,%20quiero%20una%20cotización" target="_blank" class="btn-hero-primary">
+                    <a href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20un%20proyecto%20con%20A.S.T." target="_blank" rel="noopener" class="btn-hero-primary">
                         <i class="bi bi-whatsapp"></i> Cotizar sin costo
                     </a>
                     <a href="#servicios" class="btn-hero-secondary">
@@ -1039,7 +1065,7 @@
                     <i class="bi bi-whatsapp"></i>
                     <h5>WhatsApp directo</h5>
                     <p>Cuéntanos tu proyecto y te respondemos por WhatsApp.</p>
-                    <a href="https://wa.me/573137713430" target="_blank" class="btn-cta-card">
+                    <a href="https://wa.me/573137713430?text=Hola%2C%20quiero%20hacer%20una%20consulta" target="_blank" rel="noopener" class="btn-cta-card">
                         <i class="bi bi-whatsapp"></i> Escribir ahora
                     </a>
                 </div>
@@ -1105,8 +1131,8 @@
             <div class="col-lg-4">
                 <p class="footer-heading">Contacto</p>
                 <div class="footer-contact-item"><i class="bi bi-geo-alt-fill"></i> Barranquilla, Atlántico, Colombia</div>
-                <div class="footer-contact-item"><i class="bi bi-whatsapp"></i> +57 313 771 3430</div>
-                <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i> arrietasolucionestecnologicas@gmail.com</div>
+                <div class="footer-contact-item"><i class="bi bi-whatsapp"></i> <a href="https://wa.me/573137713430?text=Hola%2C%20quiero%20hacer%20una%20consulta" target="_blank" rel="noopener" class="footer-inline-link">+57 313 771 3430</a></div>
+                <div class="footer-contact-item"><i class="bi bi-envelope-fill"></i> <a href="mailto:arrietasolucionestecnologicas@gmail.com" class="footer-inline-link">arrietasolucionestecnologicas@gmail.com</a></div>
                 <div class="footer-contact-item"><i class="bi bi-clock-fill"></i> Lunes a sábado: 7:30am a 5:30pm</div>
             </div>
         </div>
@@ -1172,6 +1198,12 @@
         </div>
     </div>
 </div>
+
+<!-- ── BOTÓN FLOTANTE DE WHATSAPP ───────────────────────────── -->
+<a href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20un%20servicio%20de%20A.S.T." target="_blank" rel="noopener" class="wa-float" aria-label="Escribir por WhatsApp a A.S.T.">
+    <i class="bi bi-whatsapp" aria-hidden="true"></i>
+    <span>WhatsApp</span>
+</a>
 
 <!-- ── TOAST CONTAINER ──────────────────────────────────────── -->
 <div id="ast-toast-container"></div>
