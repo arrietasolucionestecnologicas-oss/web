@@ -9,6 +9,9 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxpCp7aY4L48znjtqH_1svY
 const API_KEY = "AST Web App 2026";
 const GITHUB_BASE_URL = "https://arrietasolucionestecnologicas-oss.github.io/web/share/";
 
+// Banderas definidas en index.html (window.AST_CONFIG). Valores por defecto por si faltan.
+const AST_CONFIG = Object.assign({ MOSTRAR_TIENDA: true, MOSTRAR_SERVICIOS_DEL_CATALOGO: false }, window.AST_CONFIG || {});
+
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 let globalCatalog        = [];
 let currentShareUrl      = '';
@@ -54,7 +57,8 @@ async function fetchData() {
             const services = globalCatalog.filter(item => item.tipo === 'SERVICIO');
             const products = globalCatalog.filter(item => item.tipo === 'PRODUCTO');
 
-            renderServices(services, document.getElementById('services-grid'));
+            // Los servicios de la página son fijos (index.html). El catálogo del admin solo los pinta si se activa la bandera.
+            if (AST_CONFIG.MOSTRAR_SERVICIOS_DEL_CATALOGO) renderServices(services, document.getElementById('services-grid'));
             renderStore(products, document.getElementById('store-grid'));
 
             // Auto-abrir modal si viene ?open=uuid
@@ -320,6 +324,6 @@ function handleError() {
     </div>`;
     const sg = document.getElementById('services-grid');
     const pg = document.getElementById('store-grid');
-    if (sg) sg.innerHTML = err;
+    if (sg && AST_CONFIG.MOSTRAR_SERVICIOS_DEL_CATALOGO) sg.innerHTML = err;
     if (pg) pg.innerHTML = err;
 }

@@ -62,6 +62,14 @@
     }
     </script>
 
+    <script>
+        // Banderas de la web. Se leen en script.js. No tocan la conexión con el admin.
+        window.AST_CONFIG = {
+            MOSTRAR_TIENDA: true,                    // false = oculta la sección Tienda y su enlace
+            MOSTRAR_SERVICIOS_DEL_CATALOGO: false    // false = los servicios salen de esta página, no del catálogo del admin
+        };
+    </script>
+
     <style>
         /* ── TOKENS ─────────────────────────────────── */
         :root {
@@ -472,6 +480,34 @@
         }
         .btn-service:hover { background: var(--c-dim); border-color: var(--c); }
 
+        /* Tarjetas de servicio (estáticas) */
+        .svc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .svc:hover { border-color: var(--c); transform: translateY(-4px); }
+        .svc-icon {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            background: var(--c-dim);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+        }
+        .svc-icon i { font-size: 1.5rem; color: var(--c); }
+        .svc-title { font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 8px; line-height: 1.3; }
+        .svc-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.6; flex: 1; margin-bottom: 18px; }
+        .svc-solar { border-color: rgba(255,138,0,0.45); }
+        .svc-solar:hover { border-color: var(--amber); }
+        .svc-solar .svc-icon { background: rgba(255,138,0,0.1); border-color: rgba(255,138,0,0.35); }
+        .svc-solar .svc-icon i { color: var(--amber); }
+
         /* ── PRODUCT CARDS ──────────────────────────── */
         .product-card-pub {
             background: var(--card);
@@ -820,8 +856,8 @@
                     BARRANQUILLA · ATLÁNTICO
                 </div>
                 <h1>
-                    Seguridad &<br>
-                    Control <em>Inteligente</em><br>
+                    Energía, seguridad y<br>
+                    control <em>inteligente</em><br>
                     para tu espacio
                 </h1>
                 <p class="hero-slogan">Tu proyecto, nuestra energía.</p>
@@ -923,17 +959,72 @@
 <!-- ── SERVICIOS ────────────────────────────────────────────── -->
 <section id="servicios" style="background:var(--bg); padding: 80px 0;">
     <div class="container">
-        <div class="section-eyebrow">NUESTRA EXPERIENCIA</div>
-        <h2 class="section-title">Servicios especializados</h2>
-        <p class="section-sub">Soluciones técnicas con instalación profesional y soporte post-venta.</p>
+        <div class="section-eyebrow">LO QUE HACEMOS</div>
+        <h2 class="section-title">Nuestros servicios</h2>
+        <p class="section-sub">Cuéntanos qué necesitas y te cotizamos sin costo por WhatsApp.</p>
         <div class="section-line"></div>
 
         <div id="services-grid" class="row g-4">
-            <!-- Skeletons de carga -->
-            <div class="col-md-6 col-lg-3"><div class="skeleton-card skeleton-bar"></div></div>
-            <div class="col-md-6 col-lg-3"><div class="skeleton-card skeleton-bar"></div></div>
-            <div class="col-md-6 col-lg-3"><div class="skeleton-card skeleton-bar"></div></div>
-            <div class="col-md-6 col-lg-3"><div class="skeleton-card skeleton-bar"></div></div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="svc svc-solar">
+                    <div class="svc-icon"><i class="bi bi-sun-fill" aria-hidden="true"></i></div>
+                    <h3 class="svc-title">Energía solar</h3>
+                    <p class="svc-desc">Instalación de paneles solares para hogares, negocios e instituciones.</p>
+                    <a class="btn-service" href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20energ%C3%ADa%20solar" target="_blank" rel="noopener">
+                        <i class="bi bi-whatsapp"></i> Cotizar energía solar
+                    </a>
+                </article>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="svc svc-cctv">
+                    <div class="svc-icon"><i class="bi bi-camera-video-fill" aria-hidden="true"></i></div>
+                    <h3 class="svc-title">Cámaras de seguridad (CCTV)</h3>
+                    <p class="svc-desc">Instalación y mantenimiento de cámaras de seguridad para tu casa o negocio.</p>
+                    <a class="btn-service" href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20c%C3%A1maras%20de%20seguridad%20(CCTV)" target="_blank" rel="noopener">
+                        <i class="bi bi-whatsapp"></i> Cotizar cámaras
+                    </a>
+                </article>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="svc svc-cerraduras">
+                    <div class="svc-icon"><i class="bi bi-shield-lock-fill" aria-hidden="true"></i></div>
+                    <h3 class="svc-title">Cerraduras inteligentes</h3>
+                    <p class="svc-desc">Suministro e instalación de cerraduras inteligentes.</p>
+                    <a class="btn-service" href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20una%20cerradura%20inteligente" target="_blank" rel="noopener">
+                        <i class="bi bi-whatsapp"></i> Cotizar cerraduras
+                    </a>
+                </article>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="svc svc-domotica">
+                    <div class="svc-icon"><i class="bi bi-house-gear-fill" aria-hidden="true"></i></div>
+                    <h3 class="svc-title">Casas inteligentes (domótica)</h3>
+                    <p class="svc-desc">Control de luces y dispositivos de tu casa desde el celular.</p>
+                    <a class="btn-service" href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20dom%C3%B3tica%20para%20mi%20casa" target="_blank" rel="noopener">
+                        <i class="bi bi-whatsapp"></i> Cotizar domótica
+                    </a>
+                </article>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="svc svc-electrico">
+                    <div class="svc-icon"><i class="bi bi-plug-fill" aria-hidden="true"></i></div>
+                    <h3 class="svc-title">Instalaciones y mantenimiento eléctrico</h3>
+                    <p class="svc-desc">Instalaciones eléctricas, mantenimiento y tableros eléctricos.</p>
+                    <a class="btn-service" href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20una%20instalaci%C3%B3n%20o%20mantenimiento%20el%C3%A9ctrico" target="_blank" rel="noopener">
+                        <i class="bi bi-whatsapp"></i> Cotizar electricidad
+                    </a>
+                </article>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="svc svc-transformadores">
+                    <div class="svc-icon"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i></div>
+                    <h3 class="svc-title">Transformadores</h3>
+                    <p class="svc-desc">Pruebas y mantenimiento de transformadores.</p>
+                    <a class="btn-service" href="https://wa.me/573137713430?text=Hola%2C%20quiero%20cotizar%20pruebas%20y%20mantenimiento%20de%20transformadores" target="_blank" rel="noopener">
+                        <i class="bi bi-whatsapp"></i> Cotizar transformadores
+                    </a>
+                </article>
+            </div>
         </div>
     </div>
 </section>
@@ -1017,10 +1108,12 @@
             </div>
             <div class="col-6 col-lg-2">
                 <p class="footer-heading">Servicios</p>
-                <span class="footer-link">Cámaras IP / CCTV</span>
-                <span class="footer-link">Cerraduras inteligentes</span>
-                <span class="footer-link">Electricidad RETIE</span>
-                <span class="footer-link">Domótica</span>
+                <a href="#servicios" class="footer-link">Energía solar</a>
+                <a href="#servicios" class="footer-link">Cámaras de seguridad</a>
+                <a href="#servicios" class="footer-link">Cerraduras inteligentes</a>
+                <a href="#servicios" class="footer-link">Casas inteligentes (domótica)</a>
+                <a href="#servicios" class="footer-link">Instalaciones y mantenimiento eléctrico</a>
+                <a href="#servicios" class="footer-link">Transformadores</a>
             </div>
             <div class="col-lg-4">
                 <p class="footer-heading">Contacto</p>
