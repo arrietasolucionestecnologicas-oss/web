@@ -259,7 +259,7 @@ function shareProduct(type) {
         }
 
     } else if (type === 'whatsapp') {
-        const texto = `🏢 *A.S.T. Soluciones Tecnológicas*\n\n📦 *${nombre}*\n💰 ${precio}\n\nVe todos los detalles aquí 👇\n${currentShareUrl}`;
+        const texto = `🏢 *A.S.T. Soluciones Técnicas*\n\n📦 *${nombre}*\n💰 ${precio}\n\nVe todos los detalles aquí 👇\n${currentShareUrl}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
         if (typeof gtag !== 'undefined') {
             gtag('event', 'share', { method: 'WhatsApp', content_type: 'product', item_id: nombre });
@@ -268,7 +268,7 @@ function shareProduct(type) {
     } else if (type === 'native') {
         if (navigator.share) {
             navigator.share({
-                title: `${nombre} | A.S.T. Soluciones`,
+                title: `${nombre} | A.S.T. Soluciones Técnicas`,
                 text:  `${nombre} — ${precio}`,
                 url:   currentShareUrl
             }).catch(e => {
